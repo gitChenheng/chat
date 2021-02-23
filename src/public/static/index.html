@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>聊天室</title>
+    <!-- cdn -->
+    <script src="https://cdn.bootcss.com/socket.io/3.1.1/socket.io.js"></script>
+</head>
+<body>
+<div id="register" style="display: none">
+    nickname: <input type="text" id="username">
+    <button id="login">确定</button>
+</div>
+<div id="content" style="display: none">
+    <input id="sendTxt" type="text" />
+    <button id="sendBtn">发送</button>
+    <div id="online" style="color: green"></div>
+    <div id="recv" style="max-height: 300px;overflow-y: auto;"></div>
+</div>
+<script type="text/javascript">
+    let name = window.sessionStorage.getItem('chatName') || null;
+    const registerDiv = document.getElementById("register");
+    const contentDiv = document.getElementById("content");
+    const loginBtn = document.getElementById("login");
+    const usernameInput = document.getElementById("username");
+    if(!name){
+        registerDiv.style.display = 'block';
+        contentDiv.style.display = 'none';
+    }else{
+        registerDiv.style.display = 'none';
+        contentDiv.style.display = 'block';
+        init();
+    }
+    loginBtn.onclick = function () {
+        name = usernameInput.value;
+        if(!name){
+            alert('nickname 不能为空');
+            return ;
+        }
+        registerDiv.style.display = 'none';
+        contentDiv.style.display = 'block';
+        window.sessionStorage.setItem('chatName', name);
+        init(1);
+    };
+
+    function init(flag){
+        const socket = io.connect("ws://localhost:3000", {query: `username=${name}`});
+        socket.emit('new user', name);
+        // 点击之后发送
+        document.getElementById("sendBtn").onclick = function () {
+            const txt = document.getElementById("sendTxt").value;
+            if (txt) {        // 文本不为空发送
+                socket.emit('message', txt);
+                document.getElementById("sendTxt").value = '';
+            }
+        }
+
+        // 第一个enter代表是进入事件，第二个enter为了显示需要
+        socket.on('enter', function (data) {
+            showMessage(data, 'blue')
+        })
+
+        socket.on('message', function (data) {
+            showMessage(data, 'black')
+        })
+
+        socket.on('leave', function (data) {
+            showMessage(data, 'red')
+        })
+
+        socket.on('user joined', function (data){
+            console.log(data)
+            showMessage(data, 'blue')
+        })
+        socket.on('online', function (data){
+            showOnline(data)
+        })
+
+    }
+
+    //把接收的数据显示到界面
+    function showMessage(str, color) {
+        const div = document.createElement('div');
+        div.innerHTML = str;
+        if (!!color) {
+            div.style.color = color;
+        }
+        document.getElementById('recv').appendChild(div);
+        const scrollTarget = document.getElementById('recv');
+        scrollTarget.scrollTop=scrollTarget.scrollHeight;
+    }
+    function showOnline(str) {
+        const div = document.getElementById('online');
+        div.innerText = str;
+    }
+
+</script>
+</body>
+</html>
