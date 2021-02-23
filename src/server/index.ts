@@ -39,8 +39,8 @@ app.use(helmet());
  * extensionsURL中没有扩展名时，尝试匹配传递的数组中的扩展名以搜索文件。首次发现是送达的。（默认为false）
  */
 app.use(serve(path.join(process.cwd(), "/src/public/"), {maxage: 12 * 30 * 24 * 3600 * 1000}));
-app.use(cors());
-app.use(verify());
+// app.use(cors());
+// app.use(verify());
 app.use(koaBody({multipart: true, formidable: {maxFileSize: 1000 * 1024 * 1024}})); // 10M
 app.use(bodyParser());
 app.use(restIfy());
