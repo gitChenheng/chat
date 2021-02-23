@@ -46,7 +46,7 @@
     };
 
     function init(flag){
-        const socket = io.connect("ws://localhost:3000", {query: `username=${name}`});
+        const socket = io.connect("ws://106.52.3.52:3000", {query: `username=${name}`});
         socket.emit('new user', name);
         // 点击之后发送
         document.getElementById("sendBtn").onclick = function () {
