@@ -44,8 +44,8 @@ app.use(verify());
 app.use(koaBody({multipart: true, formidable: {maxFileSize: 1000 * 1024 * 1024}})); // 10M
 app.use(bodyParser());
 app.use(restIfy());
-initRouteHandle();
-app.use(router.routes()).use(router.allowedMethods());
+// initRouteHandle();
+// app.use(router.routes()).use(router.allowedMethods());
 
 // if (process.env.NODE_ENV === ENV_PROD){
 //     const options = {
